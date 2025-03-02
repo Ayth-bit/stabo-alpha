@@ -8,6 +8,7 @@ async function getAllBBSData  () {
   const bbsAllData: BBSData[] = await response.json();
   return bbsAllData;
 }
+
 export default async function Home() {
   const bbsAllData = await getAllBBSData();
   return (
