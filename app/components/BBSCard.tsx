@@ -1,20 +1,26 @@
 import React from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { BBSData } from '../types/types';
 
-const BBSCard = () => {
+interface bbsDataProps{
+    bbsData: BBSData;
+}
+const BBSCard = ({bbsData}: bbsDataProps ) => {
+
+    const {id, title, content, username} = bbsData;
     return (
         <div>
             <Card>
                 <CardHeader>
-                    <CardTitle>Create project</CardTitle>
-                    <CardDescription>Deploy your new project in one-click.</CardDescription>
+                    <CardTitle>{title}</CardTitle>
+                    <CardDescription>{username}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ex perferendis, beatae dolor soluta voluptas obcaecati veniam eaque explicabo fuga expedita accusamus? Nemo id iusto doloribus inventore repellat? Quaerat, iusto ipsum!
+                {content}
                 </CardContent>
                 <CardFooter>
-                    <Link href={"/"} className="text-blue-500 ">Read more</Link>
+                    <Link href={`/bbs-posts/${id}`} className="text-blue-500 ">Read more</Link>
                 </CardFooter>
             </Card>
         </div>

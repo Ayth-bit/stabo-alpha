@@ -1,14 +1,18 @@
 import BBSCardlist from "./components/BBSCardlist"; 
+import { BBSData } from "./types/types";
 
-export default async function Home() {
+async function getAllBBSData  () {
   const response = await fetch("http://localhost:3000/api/post", {
     cache : "no-store",
   });
-  const BBSAllData = await response.json();
-  console.log(BBSAllData);
+  const bbsAllData: BBSData[] = await response.json();
+  return bbsAllData;
+}
+export default async function Home() {
+  const bbsAllData = await getAllBBSData();
   return (
     <main >
-      <BBSCardlist />
+      <BBSCardlist bbsAllData = {bbsAllData}/>
     </main>
   );
 }
