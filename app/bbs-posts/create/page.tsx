@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import React from 'react'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +23,7 @@ const formSchema = z.object({
     .max(128, {message: "本文は128文字以内で入力してください。"}),
 });
 
-const createBBSPage = () => {
+const CreateBBSPage = () => {
     const router = useRouter();
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -102,4 +102,4 @@ const createBBSPage = () => {
   )
 }
 
-export default createBBSPage
+export default CreateBBSPage
