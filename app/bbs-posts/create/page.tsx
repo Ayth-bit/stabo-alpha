@@ -37,7 +37,7 @@ const CreateBBSPage = () => {
     async function onSubmit(value: z.infer<typeof formSchema> ){
         const { username, title, content } = value;
         try{
-            await fetch("http://localhost:3000/api/post", {
+            await fetch("https://main.d27a8yuw905j7z.amplifyapp.com/api/post", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",
