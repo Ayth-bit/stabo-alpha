@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 
 async function getDetailBBSData(id: number) {
-  const response = await fetch(`https://stabo.world/api/post/${id}`, {
+  const response = await fetch(`https://www.stabo.world/api/post/${id}`, {
     cache: "no-store",
   });
 

@@ -37,7 +37,7 @@ const CreateBBSPage = () => {
     async function onSubmit(value: z.infer<typeof formSchema> ){
         const { username, title, content } = value;
         try{
-            await fetch("https://stabo.world/api/post", {
+            await fetch("https://www.stabo.world/api/post", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",
