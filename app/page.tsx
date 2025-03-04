@@ -2,7 +2,7 @@ import BBSCardlist from "./components/BBSCardlist";
 import { BBSData } from "./types/types";
 
 async function getAllBBSData  () {
-  const response = await fetch("https://main.d27a8yuw905j7z.amplifyapp.com/api/post", {
+  const response = await fetch("https://stabo.world/api/post", {
     cache : "no-store",
   });
   const bbsAllData: BBSData[] = await response.json();
