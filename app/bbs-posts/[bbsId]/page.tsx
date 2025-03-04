@@ -12,7 +12,8 @@ async function getDetailBBSData(id: number) {
   return bbsDetailData;
 }
 
-const BBSDetailPage = async ({ params }: { params: { bbsId: number } }) => {
+const BBSDetailPage = async (props: { params: Promise<{ bbsId: number }> }) => {
+  const params = await props.params;
   const bbsDetailData = await getDetailBBSData(params.bbsId);
   const { title, content, username } = bbsDetailData;
   return (
