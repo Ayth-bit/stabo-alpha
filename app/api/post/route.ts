@@ -3,11 +3,13 @@ import prisma from "../../../lib/prismaClient" ;
 
 export async function GET (req: Request){
     try {
+        console.log('Attempting to fetch posts from database...');
         const allBBSPost  = await prisma.post.findMany();
+        console.log('Posts fetched successfully:', allBBSPost);
         return NextResponse.json(allBBSPost); 
     } catch (error) {
         console.error('Database error:', error);
-        return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch posts', details: error.message }, { status: 500 });
     }
 }
 
