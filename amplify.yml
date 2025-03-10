@@ -1,0 +1,20 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+        # 環境変数の検証
+        - node -e "if (!process.env.DATABASE_URL) { console.error('DATABASE_URL is missing'); process.exit(1); }"
+        # Prismaの生成
+        - npx prisma generate
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/* 

@@ -1,29 +1,43 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = global as unknown as {
-  prisma: PrismaClient | undefined
-}
-
-// 環境変数チェックの方法を改善
-const getDatabaseUrl = () => {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    console.error('DATABASE_URL is missing');
-    // フォールバック値を返すか、エラーをスロー
-    return process.env.NODE_ENV === 'production'
-      ? process.env.POSTGRES_PRISMA_URL // Amplifyの代替環境変数
-      : 'postgresql://postgres:password@localhost:5432/mydb';
+const createPrismaClient = () => {
+  // データベースURLの検証
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is not set');
+    throw new Error('Database configuration is missing');
   }
-  return url;
+
+  // SSL設定を追加したクライアント設定
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL
+      }
+    },
+    log: ['error', 'warn', 'query'],
+    errorFormat: 'minimal',
+  }).$extends({
+    query: {
+      async $allOperations({ operation, model, args, query }) {
+        try {
+          return await query(args);
+        } catch (error) {
+          console.error(`Database operation failed: ${operation} on ${model}`, error);
+          throw error;
+        }
+      },
+    },
+  });
+};
+
+// グローバルインスタンスの型定義
+declare global {
+  var prisma: PrismaClient | undefined;
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  datasources: {
-    db: {
-      url: getDatabaseUrl(),
-    },
-  },
-  log: ['error', 'warn'],
-})
+// 開発環境ではグローバルインスタンスを再利用
+export const prisma = global.prisma || createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma 
+if (process.env.NODE_ENV !== 'production') {
+  global.prisma = prisma;
+} 
