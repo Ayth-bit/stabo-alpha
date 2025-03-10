@@ -19,5 +19,6 @@ model Post {
   username  String
   title     String
   content   String
-  createAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
