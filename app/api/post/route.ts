@@ -16,9 +16,12 @@ async function testConnection() {
 
 export async function GET() {
     try {
-        // データベース接続テスト
-        await prisma.$queryRaw`SELECT 1`;
-        
+        // 環境変数のデバッグログ
+        console.log('Environment:', {
+            NODE_ENV: process.env.NODE_ENV,
+            DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set'
+        });
+
         const posts = await prisma.post.findMany({
             orderBy: {
                 id: 'desc'
@@ -27,19 +30,20 @@ export async function GET() {
         
         return NextResponse.json(posts);
     } catch (error) {
-        console.error('Database error:', error);
-        
-        if (error instanceof Prisma.PrismaClientInitializationError) {
-            return NextResponse.json({
-                error: 'Database initialization error',
-                message: error.message
-            }, { status: 500 });
-        }
-        
+        console.error('GET Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+        });
+
         return NextResponse.json({
-            error: 'Internal server error',
-            message: error instanceof Error ? error.message : 'Unknown error'
-        }, { status: 500 });
+            error: 'Database error',
+            message: process.env.NODE_ENV === 'development' 
+                ? error.message 
+                : 'Internal server error'
+        }, { 
+            status: 500 
+        });
     }
 }
 

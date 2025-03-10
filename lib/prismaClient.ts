@@ -4,18 +4,26 @@ const globalForPrisma = global as unknown as {
   prisma: PrismaClient | undefined
 }
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is not set in environment variables');
+// 環境変数チェックの方法を改善
+const getDatabaseUrl = () => {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    console.error('DATABASE_URL is missing');
+    // フォールバック値を返すか、エラーをスロー
+    return process.env.NODE_ENV === 'production'
+      ? process.env.POSTGRES_PRISMA_URL // Amplifyの代替環境変数
+      : 'postgresql://postgres:password@localhost:5432/mydb';
+  }
+  return url;
 }
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: ['query', 'error', 'warn'],
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
+      url: getDatabaseUrl(),
     },
   },
-  errorFormat: 'minimal',
+  log: ['error', 'warn'],
 })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma 
