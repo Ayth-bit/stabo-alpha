@@ -21,7 +21,9 @@ const nextConfig = {
   eslint: {
     // ビルド時のESLintチェックを一時的に無効化
     ignoreDuringBuilds: true
-  }
+  },
+  poweredByHeader: false,
+  reactStrictMode: true
 };
 
 module.exports = nextConfig; 

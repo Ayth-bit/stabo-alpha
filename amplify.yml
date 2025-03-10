@@ -3,15 +3,23 @@ frontend:
   phases:
     preBuild:
       commands:
-        # 既存のnode_modulesを削除
+        # キャッシュのクリア
         - rm -rf node_modules
-        # 必要なパッケージをインストール
+        - rm -rf .next
+        # 基本的な依存関係のインストール
         - npm install
-        - npm install class-variance-authority @radix-ui/react-label clsx tailwind-merge
+        # TypeScript関連のパッケージを明示的にインストール
+        - npm install --save-dev typescript @types/node @types/react @types/react-dom
+        # UI関連のパッケージをインストール
+        - npm install class-variance-authority @radix-ui/react-label clsx tailwind-merge @hookform/resolvers @radix-ui/react-slot react-hook-form zod
         # Prismaの生成
         - npx prisma generate
+        # TypeScriptの設定を確認
+        - npx tsc --version
     build:
       commands:
+        - echo "NODE_ENV=$NODE_ENV"
+        - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
         - npm run build
   artifacts:
     baseDirectory: .next
@@ -19,4 +27,13 @@ frontend:
       - '**/*'
   cache:
     paths:
-      - node_modules/**/* 
+      - node_modules/**/*
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Strict-Transport-Security'
+          value: 'max-age=31536000; includeSubDomains'
+        - key: 'X-Frame-Options'
+          value: 'SAMEORIGIN'
+        - key: 'X-XSS-Protection'
+          value: '1; mode=block' 
