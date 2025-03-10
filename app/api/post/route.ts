@@ -4,9 +4,6 @@ import { Prisma } from "@prisma/client";
 
 export async function GET(req: Request) {
     try {
-        // データベース接続テスト
-        await prisma.$connect();
-        
         const allBBSPost = await prisma.post.findMany({
             orderBy: {
                 id: 'desc'
@@ -23,36 +20,24 @@ export async function GET(req: Request) {
     } catch (error) {
         console.error('Database error:', error);
         
-        // エラーの種類に応じた適切なレスポンス
         if (error instanceof Prisma.PrismaClientInitializationError) {
             return NextResponse.json({ 
                 error: 'Database connection failed', 
-                details: 'Could not connect to the database' 
+                details: process.env.NODE_ENV === 'development' ? error.message : 'Connection error'
             }, { status: 503 });
         }
         
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            return NextResponse.json({ 
-                error: 'Database query failed', 
-                code: error.code 
-            }, { status: 400 });
-        }
-        
         return NextResponse.json({ 
-            error: 'Internal server error' 
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? (error as Error).message : 'Unknown error'
         }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }
 
 export async function POST(req: Request) {
     try {
-        await prisma.$connect();
-        
         const { username, title, content } = await req.json();
         
-        // 入力値の検証
         if (!username || !title || !content) {
             return NextResponse.json({ 
                 error: 'Missing required fields' 
@@ -73,15 +58,14 @@ export async function POST(req: Request) {
         
         if (error instanceof Prisma.PrismaClientInitializationError) {
             return NextResponse.json({ 
-                error: 'Database connection failed' 
+                error: 'Database connection failed',
+                details: process.env.NODE_ENV === 'development' ? error.message : 'Connection error'
             }, { status: 503 });
         }
         
         return NextResponse.json({ 
             error: 'Failed to create post',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: process.env.NODE_ENV === 'development' ? (error as Error).message : 'Unknown error'
         }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }
