@@ -3,23 +3,21 @@ frontend:
   phases:
     preBuild:
       commands:
-        # キャッシュのクリア
+        # 環境のクリーンアップ
         - rm -rf node_modules
         - rm -rf .next
-        # 基本的な依存関係のインストール
+        # 依存関係のインストール
         - npm install
-        # TypeScript関連のパッケージを明示的にインストール
-        - npm install --save-dev typescript @types/node @types/react @types/react-dom
-        # UI関連のパッケージをインストール
-        - npm install class-variance-authority @radix-ui/react-label clsx tailwind-merge @hookform/resolvers @radix-ui/react-slot react-hook-form zod
-        # Prismaの生成
-        - npx prisma generate
-        # TypeScriptの設定を確認
+        # TypeScriptの確認
+        - echo "TypeScript version:"
         - npx tsc --version
+        # Prisma生成
+        - npx prisma generate
     build:
       commands:
-        - echo "NODE_ENV=$NODE_ENV"
-        - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
+        # 環境変数の確認
+        - node -e "console.log('NODE_ENV:', process.env.NODE_ENV)"
+        # ビルド実行
         - npm run build
   artifacts:
     baseDirectory: .next

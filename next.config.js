@@ -15,15 +15,19 @@ const nextConfig = {
   },
   // serverActionsの設定を削除（Next.js 14以降はデフォルトで有効）
   typescript: {
-    // ビルド時の型チェックを一時的に無効化
+    // 開発時は型チェックを有効に
     ignoreBuildErrors: true
   },
   eslint: {
-    // ビルド時のESLintチェックを一時的に無効化
+    // 開発時は有効に
     ignoreDuringBuilds: true
   },
   poweredByHeader: false,
-  reactStrictMode: true
+  reactStrictMode: true,
+  // 実験的機能の設定
+  experimental: {
+    // 必要な実験的機能があれば追加
+  }
 };
 
 module.exports = nextConfig; 
