@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import prisma from "../../../lib/prismaClient" ;
+import prisma from "../../../lib/prismaClient";
+import { Prisma } from "@prisma/client";
 
-export async function GET (req: Request){
+export async function GET(req: Request) {
     try {
         console.log('Attempting to fetch posts from database...');
         const allBBSPost  = await prisma.post.findMany();
@@ -9,7 +10,20 @@ export async function GET (req: Request){
         return NextResponse.json(allBBSPost); 
     } catch (error) {
         console.error('Database error:', error);
-        return NextResponse.json({ error: 'Failed to fetch posts', details: error.message }, { status: 500 });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return NextResponse.json({ 
+                error: 'Database error', 
+                code: error.code,
+                details: error.message 
+            }, { 
+                status: 500 
+            });
+        }
+        return NextResponse.json({ 
+            error: 'Internal server error' 
+        }, { 
+            status: 500 
+        });
     }
 }
 
@@ -27,6 +41,19 @@ export async function POST (req: Request){
         return NextResponse.json(post); 
     } catch (error) {
         console.error('Database error:', error);
-        return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return NextResponse.json({ 
+                error: 'Database error', 
+                code: error.code,
+                details: error.message 
+            }, { 
+                status: 500 
+            });
+        }
+        return NextResponse.json({ 
+            error: 'Internal server error' 
+        }, { 
+            status: 500 
+        });
     }
 }
