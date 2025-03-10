@@ -16,54 +16,41 @@ async function testConnection() {
 
 export async function GET() {
     try {
-        // 接続テスト
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            return NextResponse.json({ 
-                error: 'Database connection failed' 
-            }, { 
-                status: 503 
-            });
-        }
-
-        const allBBSPost = await prisma.post.findMany({
+        // データベース接続テスト
+        await prisma.$queryRaw`SELECT 1`;
+        
+        const posts = await prisma.post.findMany({
             orderBy: {
                 id: 'desc'
             }
         });
         
-        return NextResponse.json(allBBSPost);
+        return NextResponse.json(posts);
     } catch (error) {
-        console.error('GET error:', error);
-        return NextResponse.json({ 
-            error: 'Database error', 
+        console.error('Database error:', error);
+        
+        if (error instanceof Prisma.PrismaClientInitializationError) {
+            return NextResponse.json({
+                error: 'Database initialization error',
+                message: error.message
+            }, { status: 500 });
+        }
+        
+        return NextResponse.json({
+            error: 'Internal server error',
             message: error instanceof Error ? error.message : 'Unknown error'
-        }, { 
-            status: 500 
-        });
+        }, { status: 500 });
     }
 }
 
 export async function POST(req: Request) {
     try {
-        // 接続テスト
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            return NextResponse.json({ 
-                error: 'Database connection failed' 
-            }, { 
-                status: 503 
-            });
-        }
-
         const { username, title, content } = await req.json();
-
+        
         if (!username || !title || !content) {
-            return NextResponse.json({ 
-                error: 'Missing required fields' 
-            }, { 
-                status: 400 
-            });
+            return NextResponse.json({
+                error: 'Missing required fields'
+            }, { status: 400 });
         }
 
         const post = await prisma.post.create({
@@ -77,11 +64,17 @@ export async function POST(req: Request) {
         return NextResponse.json(post);
     } catch (error) {
         console.error('POST error:', error);
-        return NextResponse.json({ 
-            error: 'Database error', 
+        
+        if (error instanceof Prisma.PrismaClientInitializationError) {
+            return NextResponse.json({
+                error: 'Database initialization error',
+                message: error.message
+            }, { status: 500 });
+        }
+
+        return NextResponse.json({
+            error: 'Internal server error',
             message: error instanceof Error ? error.message : 'Unknown error'
-        }, { 
-            status: 500 
-        });
+        }, { status: 500 });
     }
 }
