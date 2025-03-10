@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
-const createPrismaClient = () => {
+// PrismaClientの型を定義
+const prismaClientSingleton = () => {
   // データベースURLの検証
   if (!process.env.DATABASE_URL) {
     console.error('DATABASE_URL is not set');
@@ -16,28 +17,20 @@ const createPrismaClient = () => {
     },
     log: ['error', 'warn', 'query'],
     errorFormat: 'minimal',
-  }).$extends({
-    query: {
-      async $allOperations({ operation, model, args, query }) {
-        try {
-          return await query(args);
-        } catch (error) {
-          console.error(`Database operation failed: ${operation} on ${model}`, error);
-          throw error;
-        }
-      },
-    },
-  });
-};
-
-// グローバルインスタンスの型定義
-declare global {
-  var prisma: PrismaClient | undefined;
+  })
 }
 
-// 開発環境ではグローバルインスタンスを再利用
-export const prisma = global.prisma || createPrismaClient();
+// グローバル変数の型定義
+declare global {
+  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+}
 
+// prismaインスタンスの作成または再利用
+const prisma = globalThis.prisma ?? prismaClientSingleton()
+
+// 開発環境でのみグローバルに保存
 if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma;
-} 
+  globalThis.prisma = prisma
+}
+
+export { prisma } 
