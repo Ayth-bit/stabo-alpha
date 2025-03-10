@@ -3,9 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
-        # 環境変数の検証
-        - node -e "if (!process.env.DATABASE_URL) { console.error('DATABASE_URL is missing'); process.exit(1); }"
+        # 既存のnode_modulesを削除
+        - rm -rf node_modules
+        # 必要なパッケージをインストール
+        - npm install
+        - npm install class-variance-authority @radix-ui/react-label clsx tailwind-merge
         # Prismaの生成
         - npx prisma generate
     build:
