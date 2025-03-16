@@ -7,7 +7,10 @@ const nextConfig = {
     ignoreDuringBuilds: true
   },
   poweredByHeader: false,
-  reactStrictMode: true
+  reactStrictMode: true,
+  experimental: {
+    serverActions: true
+  }
 };
 
 module.exports = nextConfig;
